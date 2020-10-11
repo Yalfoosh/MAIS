@@ -29,7 +29,7 @@ def array_2d_to_zigzag(array_2d: np.ndarray):
         A np.ndarray of shape AxB.
 
     :return:
-        A np.ndarray of shape 1xAB.
+        A np.ndarray of shape AB.
     """
     return np.concatenate(
         [
