@@ -1,3 +1,17 @@
+# Copyright 2020 Yalfoosh
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
 from pathlib import Path
 
 import numpy as np
@@ -6,6 +20,10 @@ from . import constants
 
 
 class Ppm6Image:
+    """
+    A class for easier handling of PPM6 images.
+    """
+
     def __init__(self, image_path: Path or str):
         with open(image_path, mode="rb") as file:
             self._file_type = file.readline().decode("utf8").strip()
@@ -39,23 +57,53 @@ class Ppm6Image:
 
     # region Properties
     @property
-    def file_type(self):
+    def file_type(self) -> str:
+        """
+        The file type property.
+
+        :return:
+            A string representing the file type (should be only "P6").
+        """
         return self._file_type
 
     @property
-    def width(self):
+    def width(self) -> int:
+        """
+        The image width property.
+
+        :return:
+            An int representing the image width.
+        """
         return self._width
 
     @property
-    def height(self):
+    def height(self) -> int:
+        """
+        The image height property.
+
+        :return:
+            An int representing the image height.
+        """
         return self._height
 
     @property
-    def max_value(self):
+    def max_value(self) -> int:
+        """
+        The maximum value property.
+
+        :return:
+            An int representing the maximum value found in the image.
+        """
         return self._max_value
 
     @property
-    def data(self):
+    def data(self) -> np.ndarray:
+        """
+        The image data.
+
+        :return:
+            A np.ndarray of shape HxWx3 representing the image data.
+        """
         return np.copy(self._data)
 
     # endregion
