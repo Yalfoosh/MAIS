@@ -2,4 +2,4 @@
 
 ## Poveznice
 
-[1. domaća zadaća](./dz/dz-01)
+- [1. domaća zadaća](./dz-01)
