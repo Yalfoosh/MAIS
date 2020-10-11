@@ -24,9 +24,7 @@ def array_2d_to_zigzag(array_2d: np.ndarray):
          [4, 5, 6],
          [7, 8, 9]]
 
-         [[1, 2, 4],
-          [7, 5, 3],
-          [6, 8, 9]]
+         [[1, 2, 4, 7, 5, 3, 6, 8, 9]]
     :param array_2d:
         A np.ndarray of shape AxB.
 
@@ -44,6 +42,13 @@ def array_2d_to_zigzag(array_2d: np.ndarray):
 def zigzag_pixel_blocks(pixel_blocks: np.ndarray):
     """
     Converts the 2D arrays in pixel blocks into 1D arrays by zigzag scanning.
+
+    Example:
+        [[1, 2, 3],
+         [4, 5, 6],
+         [7, 8, 9]]
+
+         [[1, 2, 4, 7, 5, 3, 6, 8, 9]]
 
     :param pixel_blocks:
         A np.ndarray of shape AxBx8x8x3, where A = H/8, B = W/8.
