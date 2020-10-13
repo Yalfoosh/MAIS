@@ -29,7 +29,9 @@ DEFAULT_Y_ADDITION = 0
 DEFAULT_CB_ADDITION = 128
 DEFAULT_CR_ADDITION = 128
 
-DCT_C_ZERO_VAL = np.reciprocal(np.square(2))
+DCT_C_ZERO_VAL = 0.5
+DCT_C_NONZERO_VAL = 1
+PI_SIXTEENTH = np.pi / 16
 
 K1_TABLE = (
     (16, 11, 10, 16, 24, 40, 51, 61),
@@ -144,43 +146,28 @@ def divide_image_to_blocks(
     return np.array(to_return)
 
 
-def dct_2d_on_8x8_block(pixel_block: np.ndarray):
+def dct_2d_on_8x8_block(pixel_block: np.ndarray) -> np.ndarray:
     to_return = list()
 
-    for i, pixel_block_row in enumerate(pixel_block):
+    for u in range(8):
         current_row = list()
 
-        for j, pixel in enumerate(pixel_block_row):
-            current_value = 0.0
+        for v in range(8):
+            coefficient = DCT_C_ZERO_VAL if (u == 0 or v == 0) else DCT_C_NONZERO_VAL
+            coefficient /= 4
+            u_coef = u * PI_SIXTEENTH
+            v_coef = v * PI_SIXTEENTH
+            current_value = np.zeros(pixel_block[0][0].shape, dtype=np.float64)
 
-            for u in range(8):
-                for v in range(8):
-                    c = (DCT_C_ZERO_VAL if u == 0 else 1) * (
-                        DCT_C_ZERO_VAL if v == 0 else 1
-                    )
-
+            for i, pixel_block_row in enumerate(pixel_block):
+                for j, pixel in enumerate(pixel_block_row):
                     current_value += (
-                        c
-                        * pixel
-                        * np.cos(((2 * i + 1) * u * np.pi) / 16)
-                        * np.cos(((2 * j + 1) * v * np.pi) / 16)
+                        pixel
+                        * np.cos((2 * i + 1) * u_coef)
+                        * np.cos((2 * j + 1) * v_coef)
                     )
 
-            current_row.append(current_value / 4)
-
-        to_return.append(current_row)
-
-    return np.array(to_return)
-
-
-def dct_2d(pixel_blocks: np.ndarray):
-    to_return = list()
-
-    for row in pixel_blocks:
-        current_row = list()
-
-        for pixel_block in row:
-            current_row.append(dct_2d_on_8x8_block(pixel_block))
+            current_row.append(coefficient * current_value)
 
         to_return.append(current_row)
 
@@ -301,47 +288,42 @@ def main():
     shifted_ycbcr = shift_image_pixels(image_ycbcr, -128)
     pixel_blocks = divide_image_to_blocks(shifted_ycbcr)
 
-    dct_blocks = dct_2d(pixel_blocks)
-
-    quantization_tensor = get_quantization_tensor()
-    quantized_blocks = quantize(dct_blocks, quantization_tensor)
-
     if args.block_index is not None:
-        if args.block_index < (quantized_blocks.shape[0] * quantized_blocks.shape[1]):
-            print(
-                quantized_blocks[args.block_index // quantized_blocks.shape[0]][
-                    args.block_index % quantized_blocks.shape[0]
-                ].transpose(2, 0, 1)
-            )
-        else:
+        if not (args.block_index < (pixel_blocks.shape[0] * pixel_blocks.shape[1])):
             raise IndexError(
                 dedent(
                     f"""\
                     Block index {args.block_index} is out of bounds for pixel block \
-                    shape of {quantized_blocks.shape[0]} x {quantized_blocks.shape[1]}!\
+                    shape of {pixel_blocks.shape[0]} x {pixel_blocks.shape[1]}!\
                     """
                 )
             )
 
-    zigzagged_blocks = zigzag_pixel_blocks(quantized_blocks)
+        block_of_interest = pixel_blocks[args.block_index // pixel_blocks.shape[0]][
+            args.block_index % pixel_blocks.shape[0]
+        ]
 
-    blocks_to_write = zigzagged_blocks.reshape((-1, 3, 64)).transpose((1, 0, 2))
+        dct_block = dct_2d_on_8x8_block(block_of_interest)
 
-    if args.output_path is not None:
-        with open(args.output_path, mode="w+", encoding="ascii") as file:
-            to_write = f"{image.width} x {image.height}"
+        quantization_tensor = get_quantization_tensor()
+        quantized_block = quantize_pixel_block(dct_block, quantization_tensor)
 
-            for component_block_to_write in blocks_to_write:
-                to_write += "\n"
-                to_write += "\n".join(
-                    [
-                        " ".join([str(int(x)) for x in row])
-                        for row in component_block_to_write
-                    ]
+        block_to_print = quantized_block.transpose(2, 0, 1)
+        print("\n\n".join([str(x) for x in block_to_print]))
+
+        zigzagged_block = np.array([array_2d_to_zigzag(x) for x in block_to_print])
+
+        if args.output_path is not None:
+            with open(args.output_path, mode="w+", encoding="ascii") as file:
+                file.write(
+                    "\n\n".join(
+                        [
+                            " ".join([str(element) for element in component])
+                            for component in zigzagged_block
+                        ]
+                    )
+                    + "\n"
                 )
-                to_write += "\n"
-
-            file.write(to_write)
 
 
 if __name__ == "__main__":

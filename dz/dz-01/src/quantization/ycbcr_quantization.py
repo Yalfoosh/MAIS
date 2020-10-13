@@ -77,3 +77,46 @@ def quantize(pixel_blocks: np.ndarray, quantization_tensor: np.ndarray) -> np.nd
         to_return.append(current_row)
 
     return np.array(to_return)
+
+
+def dequantize_pixel_block(
+    pixel_block: np.ndarray, quantization_tensor: np.ndarray
+) -> np.ndarray:
+    """
+    Dequantizes a single pixel block.
+
+    :param pixel_block:
+        A np.ndarray of shape 8x8x3 you wish to dequantize.
+    :param quantization_tensor:
+        A np.ndarray of shape 8x8x3 you wish to dequantize with.
+
+    :return:
+        A np.ndarray of shape 8x8x3: the dequantization result.
+    """
+    return np.rint(pixel_block * quantization_tensor).astype(int)
+
+
+def dequantize(pixel_blocks: np.ndarray, quantization_tensor: np.ndarray) -> np.ndarray:
+    """
+    Dequantizes an image comprised of pixel blocks.
+
+    :param pixel_blocks:
+        A np.ndarray of shape AxBx8x8x3, where 8A and 8B are the height and width of
+        the original image, respectively.
+    :param quantization_tensor:
+        A np.ndarray of shape 8x8x3 you with to dequantize the pixel blocks with.
+
+    :return:
+        A np.ndarray of shape AxBx8x8x3: the dequantization result.
+    """
+    to_return = list()
+
+    for pixel_block_row in pixel_blocks:
+        current_row = list()
+
+        for pixel_block in pixel_block_row:
+            current_row.append(dequantize_pixel_block(pixel_block, quantization_tensor))
+
+        to_return.append(current_row)
+
+    return np.array(to_return)
