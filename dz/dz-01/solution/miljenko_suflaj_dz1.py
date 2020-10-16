@@ -182,20 +182,6 @@ def quantize_pixel_block(pixel_block: np.ndarray, quantization_tensor: np.ndarra
     return np.rint(pixel_block / quantization_tensor).astype(int)
 
 
-def quantize(pixel_blocks: np.ndarray, quantization_tensor: np.ndarray):
-    to_return = list()
-
-    for pixel_block_row in pixel_blocks:
-        current_row = list()
-
-        for pixel_block in pixel_block_row:
-            current_row.append(quantize_pixel_block(pixel_block, quantization_tensor))
-
-        to_return.append(current_row)
-
-    return np.array(to_return)
-
-
 def array_2d_to_zigzag(array_2d: np.ndarray):
     return np.concatenate(
         [
@@ -203,25 +189,6 @@ def array_2d_to_zigzag(array_2d: np.ndarray):
             for k in range(1 - array_2d.shape[0], array_2d.shape[0])
         ]
     )
-
-
-def zigzag_pixel_blocks(pixel_blocks: np.ndarray):
-    to_return = list()
-
-    for pixel_block_row in pixel_blocks:
-        current_row = list()
-
-        for pixel_block in pixel_block_row:
-            current_block = list()
-
-            for pixel_sector in pixel_block.transpose(2, 0, 1):
-                current_block.append(array_2d_to_zigzag(pixel_sector))
-
-            current_row.append(current_block)
-
-        to_return.append(current_row)
-
-    return np.array(to_return)
 
 
 # endregion
@@ -235,7 +202,7 @@ parser.add_argument(
     metavar="STRING",
     default=None,
     help=dedent(
-        f"""
+        """
         [Optional]
         A string representing the path to the PPM6 formatted file
         you want to work with.
@@ -250,7 +217,7 @@ parser.add_argument(
     metavar="UINT",
     default=None,
     help=dedent(
-        f"""
+        """
         [Optional]
         An unsigned integer representing the 0-based index of the
         block you wish to print after quantization.
@@ -265,7 +232,7 @@ parser.add_argument(
     metavar="STRING",
     default=None,
     help=dedent(
-        f"""
+        """
         [Optional]
         A string representing the path to the program output.
         If not specified, this step will be skipped.
