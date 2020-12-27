@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/data/projekti/faks/MAIS/dz/dz-02/main.c
+ctype.h
+-
+malloc.h
+-
+stdio.h
+-
+stdint.h
+-
+stdlib.h
+-
+string.h
+-
+
