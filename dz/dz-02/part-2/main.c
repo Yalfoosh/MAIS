@@ -181,19 +181,20 @@ double get_block_mad(ImageData reference_block, ImageData interesting_block) {
 
     return result / n_elements;
 }
+
 BlockData* get_block_difference(ImageData reference_image, ImageData interesting_image, uint64_t origin_block_index) {
     // Initialize reference block
     uint64_t blocks_per_row = reference_image.width / BLOCK_WIDTH;
-    int64_t origin_x = origin_block_index % blocks_per_row;
-    int64_t origin_y = origin_block_index / blocks_per_row;
+    int64_t origin_x = (origin_block_index % blocks_per_row) * BLOCK_WIDTH;
+    int64_t origin_y = (origin_block_index / blocks_per_row) * BLOCK_HEIGHT;
 
     ImageData* reference_block = get_block_from_origin(reference_image, origin_x, origin_y);
 
     // Calculate block difference properties
-    uint64_t left_offset = BLOCK_X_MINUS_DIFF;
-    uint64_t right_offset = BLOCK_X_PLUS_DIFF;
-    uint64_t up_offset = BLOCK_Y_MINUS_DIFF;
-    uint64_t down_offset = BLOCK_Y_PLUS_DIFF;
+    int64_t left_offset = BLOCK_X_MINUS_DIFF;
+    int64_t right_offset = BLOCK_X_PLUS_DIFF;
+    int64_t up_offset = BLOCK_Y_MINUS_DIFF;
+    int64_t down_offset = BLOCK_Y_PLUS_DIFF;
 
     if(origin_x < left_offset) {
         left_offset = origin_x;
@@ -203,12 +204,12 @@ BlockData* get_block_difference(ImageData reference_image, ImageData interesting
         up_offset = origin_y;
     }
 
-    if(origin_x + right_offset >= reference_image.width) {
-        right_offset = reference_image.width - origin_x - 1;
+    if(origin_x + BLOCK_WIDTH + right_offset >= reference_image.width) {
+        right_offset = reference_image.width - BLOCK_WIDTH - origin_x;
     }
 
-    if(origin_y + down_offset >= reference_image.height) {
-        down_offset = reference_image.height - origin_y - 1;
+    if(origin_y + BLOCK_HEIGHT + down_offset >= reference_image.height) {
+        down_offset = reference_image.height - BLOCK_HEIGHT - origin_y;
     }
 
     uint64_t x_start = origin_x - left_offset;
@@ -216,8 +217,8 @@ BlockData* get_block_difference(ImageData reference_image, ImageData interesting
 
     // Initializing block difference
     BlockData* to_return = (BlockData*)malloc(sizeof(BlockData));
-    to_return->height = left_offset + right_offset + 1;
-    to_return->width = down_offset + up_offset + 1;
+    to_return->width = left_offset + right_offset + 1;
+    to_return->height = down_offset + up_offset + 1;
     to_return->center_x = left_offset;
     to_return->center_y = up_offset;
 
@@ -300,6 +301,26 @@ int main(int argc, char* argv[]) {
     ImageData* reference_img = read_image_data(reference_image_path);
     ImageData* interesting_img = read_image_data(interesting_image_path);
 
+    /*
+    for(uint64_t i = 0; i < 1024; ++i) {
+        BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, i);
+        Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
+
+        uint64_t block_x = movement_vector->x + block_difference->center_x;
+        uint64_t block_y = movement_vector->y + block_difference->center_y;
+
+        printf("Blok %lu: (%ld,%ld), MAD = %.3f\n",
+               i,
+               movement_vector->x,
+               movement_vector->y,
+               block_difference->data[block_y][block_x]
+               );
+
+        free_vector2d_i64(movement_vector);
+        free_block_data(block_difference);
+    }
+    */
+
     BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, block_index);
     Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
 
@@ -307,6 +328,7 @@ int main(int argc, char* argv[]) {
 
     free_vector2d_i64(movement_vector);
     free_block_data(block_difference);
+
     free_image_data(interesting_img);
     free_image_data(reference_img);
 
