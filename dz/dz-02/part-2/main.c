@@ -184,11 +184,11 @@ double get_block_mad(ImageData reference_block, ImageData interesting_block) {
 
 BlockData* get_block_difference(ImageData reference_image, ImageData interesting_image, uint64_t origin_block_index) {
     // Initialize reference block
-    uint64_t blocks_per_row = reference_image.width / BLOCK_WIDTH;
+    uint64_t blocks_per_row = interesting_image.width / BLOCK_WIDTH;
     int64_t origin_x = (origin_block_index % blocks_per_row) * BLOCK_WIDTH;
     int64_t origin_y = (origin_block_index / blocks_per_row) * BLOCK_HEIGHT;
 
-    ImageData* reference_block = get_block_from_origin(reference_image, origin_x, origin_y);
+    ImageData* reference_block = get_block_from_origin(interesting_image, origin_x, origin_y);
 
     // Calculate block difference properties
     int64_t left_offset = BLOCK_X_MINUS_DIFF;
@@ -204,12 +204,12 @@ BlockData* get_block_difference(ImageData reference_image, ImageData interesting
         up_offset = origin_y;
     }
 
-    if(origin_x + BLOCK_WIDTH + right_offset >= reference_image.width) {
-        right_offset = reference_image.width - BLOCK_WIDTH - origin_x;
+    if(origin_x + BLOCK_WIDTH + right_offset >= interesting_image.width) {
+        right_offset = interesting_image.width - BLOCK_WIDTH - origin_x;
     }
 
-    if(origin_y + BLOCK_HEIGHT + down_offset >= reference_image.height) {
-        down_offset = reference_image.height - BLOCK_HEIGHT - origin_y;
+    if(origin_y + BLOCK_HEIGHT + down_offset >= interesting_image.height) {
+        down_offset = interesting_image.height - BLOCK_HEIGHT - origin_y;
     }
 
     uint64_t x_start = origin_x - left_offset;
@@ -233,7 +233,7 @@ BlockData* get_block_difference(ImageData reference_image, ImageData interesting
             int64_t current_origin_x = x_start + j;
             int64_t current_origin_y = y_start + i;
 
-            ImageData* t_block = get_block_from_origin(interesting_image, current_origin_x, current_origin_y);
+            ImageData* t_block = get_block_from_origin(reference_image, current_origin_x, current_origin_y);
 
             to_return->data[i][j] = get_block_mad(*reference_block, *t_block);
 
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
     ImageData* reference_img = read_image_data(reference_image_path);
     ImageData* interesting_img = read_image_data(interesting_image_path);
 
-    /*
+
     for(uint64_t i = 0; i < 1024; ++i) {
         BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, i);
         Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
@@ -319,8 +319,8 @@ int main(int argc, char* argv[]) {
         free_vector2d_i64(movement_vector);
         free_block_data(block_difference);
     }
-    */
 
+    /*
     BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, block_index);
     Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
 
@@ -328,6 +328,7 @@ int main(int argc, char* argv[]) {
 
     free_vector2d_i64(movement_vector);
     free_block_data(block_difference);
+     */
 
     free_image_data(interesting_img);
     free_image_data(reference_img);
