@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
     ImageData* reference_img = read_image_data(reference_image_path);
     ImageData* interesting_img = read_image_data(interesting_image_path);
 
-
+    /*
     for(uint64_t i = 0; i < 1024; ++i) {
         BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, i);
         Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
@@ -319,8 +319,8 @@ int main(int argc, char* argv[]) {
         free_vector2d_i64(movement_vector);
         free_block_data(block_difference);
     }
+    */
 
-    /*
     BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, block_index);
     Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
 
@@ -328,7 +328,7 @@ int main(int argc, char* argv[]) {
 
     free_vector2d_i64(movement_vector);
     free_block_data(block_difference);
-     */
+
 
     free_image_data(interesting_img);
     free_image_data(reference_img);
