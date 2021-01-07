@@ -291,11 +291,11 @@ int main(int argc, char* argv[]) {
     }
 
     if(reference_image_path == NULL) {
-        reference_image_path = "lenna.pgm";
+        reference_image_path = "lenna1.pgm";
     }
 
     if(interesting_image_path == NULL) {
-        interesting_image_path = "lenna1.pgm";
+        interesting_image_path = "lenna.pgm";
     }
 
     ImageData* reference_img = read_image_data(reference_image_path);
@@ -328,7 +328,6 @@ int main(int argc, char* argv[]) {
 
     free_vector2d_i64(movement_vector);
     free_block_data(block_difference);
-
 
     free_image_data(interesting_img);
     free_image_data(reference_img);
