@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
     BlockData* block_difference = get_block_difference(*reference_img, *interesting_img, block_index);
     Vector2D_i64* movement_vector = get_movement_vector(*block_difference);
 
-    printf("(%ld,%ld)\n", movement_vector->x, movement_vector->y);
+    printf("%ld,%ld\n", movement_vector->x, movement_vector->y);
 
     free_vector2d_i64(movement_vector);
     free_block_data(block_difference);
