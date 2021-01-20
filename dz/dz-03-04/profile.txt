@@ -1,0 +1,6 @@
+1. dct_2d_on_8x8_block              Doprinos (42.46%)
+2. rgb_to_ycbcr                     Doprinos (39.45%)
+3. {built-in method numpy.array}    Doprinos (13.21%)
+4. Ppm6Image.read                   Doprinos (2.42%)
+5. rgb_to_ycbcr                     Doprinos (1.41%)
+Vrijeme izvodjenja: 5.042 s.
