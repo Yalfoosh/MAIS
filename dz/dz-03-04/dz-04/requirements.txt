@@ -1,0 +1,10 @@
+certifi==2020.12.5
+icc-rt==2020.0.133
+intel-numpy==1.15.1
+intel-openmp==2020.0.133
+mkl==2019.0
+mkl-fft==1.0.6
+mkl-random==1.0.1.1
+numpy==1.15.1
+tbb==2021.1.1
+tbb4py==2021.1.1
